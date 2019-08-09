@@ -42,7 +42,7 @@ class App extends Component {
   }
 
   getResultWorkHours = () => {
-    let i;
+    // let i;
     let startDate = moment(this.state.empStartDate);
     let endDate = moment(this.state.empEndDate);
     // let day = [4,5,6];
