@@ -14,13 +14,13 @@ class App extends Component {
       empEndDate: "",
       empTotalWeeklyHours: "",
       empWeeklyHours: {
+        sunday: 0,
         monday: 0,
         tuesday: 0,
         wednesday: 0,
         thursday: 0,
         friday: 0,
-        saturday: 0,
-        sunday: 0
+        saturday: 0
       },
       empParentalLeave: {
         weeks: 0,
@@ -33,29 +33,80 @@ class App extends Component {
       empPaidLeave: {
         weeks: 0,
         hours: 0
-      },
-      empTotalParentalLeave: "",
-      empTotalOtherLeave: "",
-      empTotalPaidLeave: "",
-      empTotalLeaveBal: ""
+      }
     };
   }
 
   getResultWorkHours = () => {
-    // let i;
     let startDate = moment(this.state.empStartDate);
     let endDate = moment(this.state.empEndDate);
-    // let day = [4,5,6];
+    let days = Object.values(this.state.empWeeklyHours);
+    let isoWeekday = [];
+    let totalHours = [];
+    let totalHoursPerWeek = [];
 
-    // for (i = 0; i < day.length; i++) {
-      let result = [];
-      let current = startDate.clone();
-      console.log(current.day(7 + 4).isBefore(endDate))
-      while (current.day(7 + 4).isBefore(endDate)) {
-        result.push(current.clone());
+    for (let x = 0; x < days.length; x++) {
+      if (days[x] !== 0) {
+        isoWeekday.push(x);
       }
-      console.log(result.map(m => m.format("LLLL")));
-    // }
+    }
+
+    for (let i = 0; i < isoWeekday.length; i++) {
+      let daysToAdd = (7 + isoWeekday[i] - startDate.isoWeekday()) % 7;
+      let nextWeek = startDate.clone().add(daysToAdd, "days");
+      if (nextWeek.isAfter(endDate)) {
+        return 0;
+      }
+      let weeksBetween = endDate.diff(nextWeek, "weeks") + 1;
+      totalHours.push(weeksBetween * days[isoWeekday[i]]);
+      totalHoursPerWeek.push(days[isoWeekday[i]]);
+    }
+    let sumTotalHoursPerWeek = totalHoursPerWeek.reduce((a, b) => a + b, 0);
+    let sumTotalHours = totalHours.reduce((a, b) => a + b, 0);
+
+    return [
+      sumTotalHours,
+      this.getResultlLeaves(
+        sumTotalHoursPerWeek,
+        this.state.empParentalLeave.weeks,
+        this.state.empParentalLeave.hours
+      ),
+      this.getResultlLeaves(
+        sumTotalHoursPerWeek,
+        this.state.empOtherLeave.weeks,
+        this.state.empOtherLeave.hours
+      ),
+      this.getResultlLeaves(
+        sumTotalHoursPerWeek,
+        this.state.empPaidLeave.weeks,
+        this.state.empPaidLeave.hours
+      ),
+      this.getResultAccrualRate(this.state.empShiftworker),
+      this.getResultAnnualLeave(sumTotalHours,sumTotalHoursPerWeek)
+    ];
+  };
+
+
+  getResultAnnualLeave = (sumTotalHours, sumTotalHoursPerWeek) => {
+    let parentalLeave = (sumTotalHoursPerWeek * this.state.empParentalLeave.weeks) + this.state.empParentalLeave.hour;
+    let otherLeave = (sumTotalHoursPerWeek * this.state.empOtherLeave.weeks) + this.state.empOtherLeave.hour;
+    let paidLeave = (sumTotalHoursPerWeek * this.state.empPaidLeave.weeks) + this.state.empPaidLeave.hour;
+    let accrualRate = this.getResultAccrualRate(this.state.empShiftworker)
+    console.log(parentalLeave)
+    return ((sumTotalHours - otherLeave - parentalLeave)/accrualRate) - paidLeave
+
+  }
+
+  getResultlLeaves = (daysOnAWeek, weeks, hours) => {
+    if (weeks > 0 || hours > 0) {
+      return (daysOnAWeek * weeks) + hours;
+    } else {
+      return 0;
+    }
+  };
+
+  getResultAccrualRate = answer => {
+    return answer === "true" ? 10.428571 : 13.035714;
   };
 
   updateInput = e => {
@@ -79,7 +130,7 @@ class App extends Component {
     const { empWeeklyHours } = { ...this.state };
     let currentState = empWeeklyHours;
     let { name, value } = e.target;
-    value < 0 ? (currentState[name] = 0) : (currentState[name] = value);
+    value < 0 ? (currentState[name] = 0) : (currentState[name] = Number(value));
 
     this.setState({ empWeeklyHours: currentState });
     this.sumWeekHours();
@@ -87,13 +138,13 @@ class App extends Component {
 
   sumWeekHours = () => {
     let totalWeekHours =
-      Number(this.state.empWeeklyHours.monday) +
-      Number(this.state.empWeeklyHours.tuesday) +
-      Number(this.state.empWeeklyHours.wednesday) +
-      Number(this.state.empWeeklyHours.thursday) +
-      Number(this.state.empWeeklyHours.friday) +
-      Number(this.state.empWeeklyHours.saturday) +
-      Number(this.state.empWeeklyHours.sunday);
+      this.state.empWeeklyHours.monday +
+      this.state.empWeeklyHours.tuesday +
+      this.state.empWeeklyHours.wednesday +
+      this.state.empWeeklyHours.thursday +
+      this.state.empWeeklyHours.friday +
+      this.state.empWeeklyHours.saturday +
+      this.state.empWeeklyHours.sunday;
     this.setState({ empTotalWeeklyHours: totalWeekHours });
   };
 
@@ -104,13 +155,13 @@ class App extends Component {
         empStartDate: "",
         empEndDate: "",
         empWeeklyHours: {
+          sunday: 0,
           monday: 0,
           tuesday: 0,
           wednesday: 0,
           thursday: 0,
           friday: 0,
-          saturday: 0,
-          sunday: 0
+          saturday: 0
         },
         userStep: this.state.userStep - 1
       });
@@ -535,30 +586,40 @@ class App extends Component {
 
   displayResult = () => {
     return (
-      <div>
+      <div className="result">
+        <ul>
+          <li>
+            <h2>Annual leave balance:</h2>
+            <h2>{this.getResultWorkHours()[5]}</h2>
+          </li>
+        </ul>
+        <h3>
+          Work Period: {moment(this.state.empStartDate).format("MMM D, YYYY")}{" "}
+          to {moment(this.state.empEndDate).format("MMM D, YYYY")}
+        </h3>
         <ul>
           <li>
             <p>Total hours in the work period:</p>
-            <p>{this.getResultWorkHours()}</p>
+            <p>{this.getResultWorkHours()[0]}</p>
           </li>
           <li>
             <p>
               Total hours of leave taken under the Paid Parental Leave Scheme in
               the period:
             </p>
-            <p />
+            <p>{this.getResultWorkHours()[1]}</p>
           </li>
           <li>
             <p>Total hours of unpaid leave taken in the period:</p>
-            <p />
+            <p>{this.getResultWorkHours()[2]}</p>
           </li>
           <li>
             <p>Annual leave accrual rate:</p>
-            <p />
+            <p>{this.getResultWorkHours()[4]}</p>
           </li>
           <li>
             <p>Total hours of annual leave taken during the period:</p>
-            <p />
+            <p>{this.getResultWorkHours()[3]}</p>
           </li>
         </ul>
       </div>

@@ -207,7 +207,76 @@
 }
 
 .leave__cal input::placeholder {
-  color: #CAD2DE;
+  color: #cad2de;
+}
+
+/* RESULT */
+
+.leave__cal .result {
+  max-width: 500px;
+  margin: auto;
+}
+
+
+.leave__cal .result h2:first-child {
+  border-radius: 8px 0 0 8px;
+  background-color: #26496E;
+  color: #FFFFFF;
+  font-family: Lato;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 27px;
+  padding: 10px 35px;
+  margin: 0;
+}
+
+.leave__cal .result h2:last-child {
+  color: #26496E;
+  font-family: Lato;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 27px;
+  background-color: #F0F2F5;
+  border-radius: 0 8px 8px 0;
+  padding: 10px 35px;
+  margin: 0;
+}
+
+.leave__cal .result h3 {
+  color: #3FAFD7;	
+  font-family: Lato;	
+  font-size: 18px;	
+  font-weight: 600;	
+  line-height: 24px;	
+  text-align: center;
+  margin: 0;
+  margin: 20px 0 30px;
+}
+
+.leave__cal .result ul {
+  margin: 0;
+  padding: 0;
+}
+
+.leave__cal .result ul li {
+  display: flex;
+  padding: 10px 0;
+  justify-content: center;
+  align-items: center;
+}
+
+.leave__cal .result ul li p {
+  flex: 50% 1;
+    width: 367px;
+    color: #536171;
+    font-family: Lato;
+    font-size: 16px;
+    margin: 0;
+}
+
+.leave__cal .result ul li p:last-child {
+  font-weight: bolder;
+  text-align: center;
 }
 
 @media screen and (max-width: 767px) {
