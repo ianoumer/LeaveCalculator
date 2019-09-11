@@ -1,5 +1,53 @@
 @import url("https://fonts.googleapis.com/css?family=Lato&display=swap");
 
+
+[data-tooltip] {
+  position: relative;
+  color: #3C4754;
+  margin: 0 5px;
+}
+
+[data-tooltip]:before,
+[data-tooltip]:after {
+  display: none;
+  position: absolute;
+  top: 0;
+}
+
+[data-tooltip]:before {
+  border-bottom: .6em solid #3C4754;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  content: "";
+  left: 0px;
+  margin-top: 25px;
+}
+
+[data-tooltip]:after {
+  border-radius: 7px;
+  content: attr(data-tooltip-message);
+  left: -5px;
+  margin-top: 30px;
+  padding: 8px 10px;
+  color: #FFFFFF;
+  font-family: Lato;
+  font-size: 14px;
+  font-size: 12px;
+  line-height: 16px;
+  text-align: left;
+  white-space: pre-wrap;
+  width: 280px;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.12);
+  background-color: #3C4754;
+  z-index: 999;
+}
+
+[data-tooltip]:hover:after,
+[data-tooltip]:hover:before {
+  display: block;
+}
+
+
 .leave__cal {
   border-radius: 24px;
   background-color: #ffffff;
@@ -16,6 +64,24 @@
   display: none;
 }
 
+.leave__cal .progress__bullet {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0 0;
+}
+
+.leave__cal .progress__bullet > span.filled{
+  background-color: #318CD7;
+}
+
+.leave__cal .progress__bullet > span{
+  height: 8px;
+  width: 8px;
+  background-color: #E9ECF6;
+  margin: 0 8px;
+  border-radius: 8px;
+}
+
 .leave__cal button {
   border: 1px solid;
   outline: none;
@@ -29,7 +95,7 @@
 }
 
 .leave__cal button.solo__back {
-  margin: 70px auto 0;
+  margin: 50px auto 0;
   border-color: #8a9bae;
   display: block;
   color: #8a9bae;
@@ -37,7 +103,7 @@
 }
 
 .leave__cal .duo {
-  margin: 60px auto 0;
+  margin: 30px auto 0;
   text-align: center;
 }
 
@@ -54,6 +120,27 @@
   background-color: #318cd7;
   border-color: #318cd7;
   color: #fff;
+  transition: 0s;
+}
+
+.leave__cal .duo > button.duo__next:disabled {
+  background-color: #8a9bae;
+  border-color: #8a9bae;
+  cursor: not-allowed;
+}
+
+.leave__cal button.duo__reset {
+  padding: 20px;
+  background-color: transparent;
+  color: #318CD7;
+  border: none;
+  outline: none;
+  border-radius: 17.5px;
+  font-family: Lato;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 27px;
+  text-align: center;
 }
 
 .leave__cal h2 {
@@ -111,6 +198,7 @@
   outline: 0;
 }
 
+/* STEP FOUR */
 .leave__cal .step__four h2 {
   text-align: left;
   margin: 30px 0 0;
@@ -122,7 +210,18 @@
   max-width: 500px;
 }
 
-/* STEP FOUR */
+.leave__cal .step__four .part__two + span{
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  color: #D64B34;
+  font-family: Lato;
+  font-size: 12px;
+  height:20px;
+  transition: .5s;
+}
+
 .leave__cal .step__four {
   max-width: 600px;
   margin: auto;
@@ -145,6 +244,10 @@
 .leave__cal .step__four .step__col {
   flex: 50%;
   padding: 0 40px 0 0;
+}
+
+.leave__cal .step__four .part__two{
+  margin-bottom: 40px;
 }
 
 .leave__cal .step__four .part__two .step__row {
@@ -171,8 +274,9 @@
   font-weight: 600;
   line-height: 27px;
   margin-bottom: 10px;
-  display: block;
+  display: inline-block;
 }
+
 .leave__cal .step__four .step__col > input {
   display: block;
   margin: auto 0;
@@ -210,6 +314,18 @@
   color: #cad2de;
 }
 
+/* CASUAL */
+
+.leave__cal .casual h2 {
+  max-width: 300px;
+  margin: 20px auto;
+}
+
+.leave__cal .casual {
+  max-width: 600px;
+  text-align: center;
+  margin: auto;
+}
 /* RESULT */
 
 .leave__cal .result {
@@ -226,7 +342,7 @@
   font-size: 18px;
   font-weight: 600;
   line-height: 27px;
-  padding: 10px 35px;
+  padding: 10px 30px;
   margin: 0;
 }
 
@@ -326,267 +442,3 @@
     width: 100%;
   }
 }
-/* 
-.rata .switch {
-  position: relative;
-  display: block;
-  margin: auto;
-  width: 170px;
-  height: 46px;
-  margin-bottom: 22px;
-  cursor: pointer;
-}
-
-.rata .switch > input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.rata .switch:before {
-  content: "Daily";
-  position: absolute;
-  top: 12px;
-  left: 22px;
-  color: #CAD2DE;
-  font-family: Lato;
-  font-size: 18px;
-  font-weight: bold;
-  line-height: 22px;
-  z-index: 3;
-}
-
-.rata .switch.daily:before,.rata .switch.hourly:after  {
-  color: #fff;
-  transition: .5s;
-}
-
-.rata .switch::after {
-  content: "Hourly";
-  position: absolute;
-  right: 14px;
-  top: 12px;
-  color: #CAD2DE;
-  font-family: Lato;
-  font-size: 18px;
-  font-weight: bold;
-  line-height: 22px;
-  z-index: 3;
-}
-
-.rata .switch > .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #f0f2f5;
-  box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.08);
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-}
-
-.rata .switch > .slider:before {
-  position: absolute;
-  content: "";
-  height: 38px;
-  width: 80px;
-  left: 4px;
-  top: 4px;
-  background-color: #99ca2f;
-  box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.3);
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-}
-
-.rata .switch > input:checked + .slider:before {
-  -webkit-transform: translateX(82px);
-  -ms-transform: translateX(82px);
-  transform: translateX(82px);
-}
-.rata .switch > .slider.round {
-  border-radius: 46px;
-}
-
-.rata .switch > .slider.round:before {
-  border-radius: 34px;
-}
-
-.rata .rata__input {
-  padding: 8px 0;
-}
-
-.rata .rata__input > label {
-  display: flex;
-}
-
-.rata .rata__input > label > p {
-  flex: 70%;
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 27px;
-  padding-right: 20px;
-  align-self: center;
-  color: #708093;
-}
-
-.rata__input > label > input {
-  flex: 30%;
-  width: 100%;
-  max-height: 40px;
-  min-width: 170px;
-  color: #708093;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 19px;
-  padding: 10px 16px;
-  border: 1px solid #cad2de;
-  border-radius: 4px;
-  background-color: rgba(255, 255, 255, 0);
-}
-
-.rata__input > label > input[type="date"] {
-  height: 40px !important;
-}
-
-.rata__input > label > input::placeholder,
-.rata__input > label > input[type="date"]:invalid::-webkit-datetime-edit {
-  color: #cad2de;
-}
-
-.rata__input > label > input[type="date"]::-webkit-calendar-picker-indicator {
-  color: rgba(0, 0, 0, 0);
-  opacity: 1;
-  display: block;
-  background: url("https://api.iconify.design/dashicons:calendar-alt.svg?color=%238A9BAE")
-    no-repeat center center / contain;
-  z-index: 3;
-  width: 10px;
-  height: 10px;
-  border-width: thin;
-}
-
-.rata .tanda-button {
-  text-transform: inherit;
-  font-weight: bold;
-  font-size: 1em;
-  padding: 10px 24px;
-  border-radius: 20.5px;
-  min-width: 160px;
-  transition: 0.5s;
-  width: 100%;
-  max-width: 367px;
-  display: block;
-  margin: 52px auto 0;
-}
-
-.rata .tanda-button:disabled {
-  cursor: not-allowed;
-}
-
-.rata .tanda-button-blue {
-  color: white;
-  background-color: #3fafd7;
-  border: 1px solid #3fafd7;
-  box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.08);
-}
-
-.rata .rata__result + button {
-  color: #3FAFD7;
-  font-weight: 500;
-  line-height: 0;
-}
-
-.rata .rata__result {
-  max-width: 370px;
-  width: 100%;
-  margin: auto;
-  text-align: center;
-  display: flex;;
-  align-items: center;
-}
-
-.rata .rata__result > span {
-  padding-top: 13px;
-  padding-bottom: 13px;
-  width: 100%;
-}
-
-.rata .rata__result > span:first-child {
-  background-color: #26496e;
-  font-size: 16px;
-  color: #fff;
-  border-radius: 10px 0 0 10px;
-}
-
-.rata .rata__result > span:last-child {
-  font-weight: 600;
-  flex: 50%;
-  font-size: 24px;
-  color: #26496e;
-  background-color: #F0F2F5;
-  border-radius: 0 10px 10px 0;
-  line-height: 22px;
-}
-
-
-.rata .rata__inputs {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 40px auto 20px;
-  max-width: 500px;
-}
-
-.rata .rata__inputs > p{
-  padding: 10px;
-  text-align: left;
-  font-size: 18px;
-  color: #536171;
-  font-weight: 600;
-}
-
-.rata .rata__inputs > p:nth-child(odd){
-  flex: 70%;
-}
-.rata .rata__inputs > p:nth-child(even){
-  flex: 30%;
-}
-
-@media screen and (max-width: 767px) {
-
-  .rata .tanda-button-blue {
-    margin-top: 20px;
-  }
-  .rata .rata__result > span:first-child {
-    font-size: 14px;
-  }
-
-  .rata .rata__result > span:last-child {
-    padding: 10px 30px;
-  }
-  
-  .rata .rata__input > label {
-    justify-content: center;
-    flex-direction: column;
-  }
-
-  .rata .rata__input > label > p {
-    align-self: flex-start;
-  }
-
-  .rata__input > label > input {
-    margin: 10px 0;
-  }
-}
-
-
-
-@media screen and (max-width: 575px) {
-
-  .rata .rata__input > label > p {
-    font-size: 16px;
-    line-height: 20px;
-  }
-} */

@@ -8,10 +8,11 @@ class App extends Component {
     this.state = {
       userType: "",
       userStep: 1,
+      buttonNext: true,
       empStatus: "",
       empShiftworker: "",
       empStartDate: "",
-      empEndDate: "",
+      empEndDate: moment().format('YYYY-MM-DD'),
       empTotalWeeklyHours: "",
       empWeeklyHours: {
         sunday: 0,
@@ -82,24 +83,43 @@ class App extends Component {
         this.state.empPaidLeave.hours
       ),
       this.getResultAccrualRate(this.state.empShiftworker),
-      this.getResultAnnualLeave(sumTotalHours,sumTotalHoursPerWeek)
+      this.getResultAnnualLeave(sumTotalHours, sumTotalHoursPerWeek)
     ];
   };
 
-
   getResultAnnualLeave = (sumTotalHours, sumTotalHoursPerWeek) => {
-    let parentalLeave = (sumTotalHoursPerWeek * this.state.empParentalLeave.weeks) + this.state.empParentalLeave.hour;
-    let otherLeave = (sumTotalHoursPerWeek * this.state.empOtherLeave.weeks) + this.state.empOtherLeave.hour;
-    let paidLeave = (sumTotalHoursPerWeek * this.state.empPaidLeave.weeks) + this.state.empPaidLeave.hour;
-    let accrualRate = this.getResultAccrualRate(this.state.empShiftworker)
-    console.log(parentalLeave)
-    return ((sumTotalHours - otherLeave - parentalLeave)/accrualRate) - paidLeave
+    let parentalLeave =
+      sumTotalHoursPerWeek * this.state.empParentalLeave.weeks +
+      this.state.empParentalLeave.hours;
+    let otherLeave =
+      sumTotalHoursPerWeek * this.state.empOtherLeave.weeks +
+      this.state.empOtherLeave.hours;
+    let paidLeave =
+      sumTotalHoursPerWeek * this.state.empPaidLeave.weeks +
+      this.state.empPaidLeave.hours;
+    let accrualRate = this.getResultAccrualRate(this.state.empShiftworker);
+    let formattedDate = moment.duration(
+      (sumTotalHours - otherLeave - parentalLeave) / accrualRate - paidLeave,
+      "hours"
+    );
+    let formattedHours = Math.floor(
+      (sumTotalHours - otherLeave - parentalLeave) / accrualRate - paidLeave);
 
-  }
+    let totalHours = formattedHours;
+    let totalMinutes = formattedDate._data.minutes;
+    console.log((sumTotalHours - otherLeave - parentalLeave) / accrualRate - paidLeave)
+    return (
+      totalHours +
+      (totalHours === 1 ? " hour" : " hours") +
+      "  and " +
+      totalMinutes +
+      (totalMinutes === 1 ? " minute" : " minutes")
+    );
+  };
 
   getResultlLeaves = (daysOnAWeek, weeks, hours) => {
     if (weeks > 0 || hours > 0) {
-      return (daysOnAWeek * weeks) + hours;
+      return daysOnAWeek * weeks + hours;
     } else {
       return 0;
     }
@@ -109,14 +129,48 @@ class App extends Component {
     return answer === "true" ? 10.428571 : 13.035714;
   };
 
+  validation = (totalHours, startDate, endDate) => {
+    if (
+      totalHours <= 38 &&
+      totalHours !== 0 &&
+      moment(endDate).isAfter(startDate)
+    ) {
+      this.setState({ buttonNext: false });
+    } else {
+      this.setState({ buttonNext: true });
+    }
+  };
+
+  errorNotes = () => {
+    if (moment(this.state.empStartDate).isAfter(moment(this.state.empEndDate))) {
+      return "The end date specified must be after the start date.";
+    } else if (this.state.empTotalWeeklyHours > 38) {
+      return "The number of hours specified must be less than or equal to 38";
+    } else {
+      return "";
+    }
+  };
+
   updateInput = e => {
     if (this.state.userStep > 3) {
       this.setState({ [e.target.name]: e.target.value });
+      this.validation(
+        this.state.empTotalWeeklyHours,
+        this.state.empStartDate,
+        this.state.empEndDate
+      );
     } else {
-      this.setState({
-        [e.target.name]: e.target.value,
-        userStep: this.state.userStep + 1
-      });
+      if (e.target.value === "casual"){
+        this.setState({
+          [e.target.name]: e.target.value,
+          userStep: this.state.userStep + 5,
+        });
+      } else {
+        this.setState({
+          [e.target.name]: e.target.value,
+          userStep: this.state.userStep + 1
+        });
+      }
     }
   };
 
@@ -146,7 +200,47 @@ class App extends Component {
       this.state.empWeeklyHours.saturday +
       this.state.empWeeklyHours.sunday;
     this.setState({ empTotalWeeklyHours: totalWeekHours });
+    this.validation(
+      totalWeekHours,
+      this.state.empStartDate,
+      this.state.empEndDate
+    );
   };
+
+  reset = () => {
+    this.setState({
+        userType: "",
+        userStep: 1,
+        buttonNext: true,
+        empStatus: "",
+        empShiftworker: "",
+        empStartDate: "",
+        empEndDate: "",
+        empTotalWeeklyHours: "",
+        empWeeklyHours: {
+          sunday: 0,
+          monday: 0,
+          tuesday: 0,
+          wednesday: 0,
+          thursday: 0,
+          friday: 0,
+          saturday: 0
+        },
+        empParentalLeave: {
+          weeks: 0,
+          hours: 0
+        },
+        empOtherLeave: {
+          weeks: 0,
+          hours: 0
+        },
+        empPaidLeave: {
+          weeks: 0,
+          hours: 0
+        }
+  
+    })
+  }
 
   stepBack = e => {
     if (this.state.userStep === 4) {
@@ -167,16 +261,32 @@ class App extends Component {
       });
     } else if (this.state.userStep === 5) {
       this.setState({
-        empParentalLeave: "",
-        empOtherLeave: "",
-        empPaidLeave: "",
+        empParentalLeave: {
+          weeks: 0,
+          hours: 0
+        },
+        empOtherLeave: {
+          weeks: 0,
+          hours: 0
+        },
+        empPaidLeave: {
+          weeks: 0,
+          hours: 0
+        },
         userStep: this.state.userStep - 1
       });
     } else {
-      this.setState({
-        [e.target.value]: "",
-        userStep: this.state.userStep - 1
-      });
+      if(this.state.empStatus === 'casual'){
+        this.setState({
+          empStatus: "",
+          userStep: this.state.userStep - 5
+        });
+      } else {
+        this.setState({
+          [e.target.name]: "",
+          userStep: this.state.userStep - 1
+        });
+      }
     }
   };
 
@@ -232,6 +342,7 @@ class App extends Component {
             <label htmlFor="employer">I’m an employer</label>
           </div>
         </div>
+        {this.progress()}
       </div>
     );
   };
@@ -239,7 +350,13 @@ class App extends Component {
   displayStep2 = () => {
     return (
       <div>
-        <h2>Select Employment Type:</h2>
+        <h2>Select Employment Type:
+        <a href="#note" 
+            data-tooltip
+            data-tooltip-message="It is important to know the type of employment because pay rates, leave and other entitlements can be different.">
+            <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+          </a>
+        </h2>
         <hr className="d__none" />
         <div className="label__parent">
           <div className="label__child">
@@ -283,6 +400,7 @@ class App extends Component {
         >
           Back
         </button>
+        {this.progress()}
       </div>
     );
   };
@@ -290,7 +408,15 @@ class App extends Component {
   displayStep3 = () => {
     return (
       <div>
-        <h2>Are you a shift worker?</h2>
+        <h2>Are you a shift worker? 
+          <a href="#note" 
+            data-tooltip
+            data-tooltip-message="A shiftworker for the purposes of the NES for an award or agreement free employee is someone who 
+            works for a business that requires shifts to be rostered 24 hours a day for 7 days a week; is also regularly rostered to work those shifts and
+            regularly works on Sundays and public holidays.">
+            <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+          </a>
+        </h2>
         <div className="label__parent">
           <div className="label__child">
             <input
@@ -322,6 +448,7 @@ class App extends Component {
         >
           Back
         </button>
+        {this.progress()}
       </div>
     );
   };
@@ -342,6 +469,11 @@ class App extends Component {
           </div>
           <div className="step__col">
             <label htmlFor="enddate">End date of work period</label>
+            <a href="#note" 
+              data-tooltip
+              data-tooltip-message="The default date is today’s date. Unless you change the date in this field, your results will show leave accumulated until today.​">
+                <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+              </a>
             <input
               id="enddate"
               name="empEndDate"
@@ -369,6 +501,7 @@ class App extends Component {
                 type="number"
                 placeholder="0"
                 min="0"
+                defaultValue={this.state.empWeeklyHours.sunday}
                 onChange={this.getWeekHours}
               />
             </div>
@@ -385,6 +518,7 @@ class App extends Component {
                 type="number"
                 min="0"
                 placeholder="0"
+                defaultValue={this.state.empWeeklyHours.monday}
                 onChange={this.getWeekHours}
               />
             </div>
@@ -401,6 +535,7 @@ class App extends Component {
                 type="number"
                 placeholder="0"
                 min="0"
+                defaultValue={this.state.empWeeklyHours.tuesday}
                 onChange={this.getWeekHours}
               />
             </div>
@@ -417,6 +552,7 @@ class App extends Component {
                 type="number"
                 placeholder="0"
                 min="0"
+                defaultValue={this.state.empWeeklyHours.wednesday}
                 onChange={this.getWeekHours}
               />
             </div>
@@ -433,6 +569,7 @@ class App extends Component {
                 type="number"
                 placeholder="0"
                 min="0"
+                defaultValue={this.state.empWeeklyHours.thursday}
                 onChange={this.getWeekHours}
               />
             </div>
@@ -449,6 +586,7 @@ class App extends Component {
                 type="number"
                 placeholder="0"
                 min="0"
+                defaultValue={this.state.empWeeklyHours.friday}
                 onChange={this.getWeekHours}
               />
             </div>
@@ -465,19 +603,26 @@ class App extends Component {
                 type="number"
                 placeholder="0"
                 min="0"
+                defaultValue={this.state.empWeeklyHours.saturday}
                 onChange={this.getWeekHours}
               />
             </div>
           </div>
         </div>
+        <span>{this.errorNotes()}</span>
         <div className="duo">
           <button className="duo__back" onClick={this.stepBack}>
             Back
           </button>
-          <button className="duo__next" onClick={this.stepForward}>
+          <button
+            disabled={this.state.buttonNext}
+            className="duo__next"
+            onClick={this.stepForward}
+          >
             Next
           </button>
         </div>
+        {this.progress()}
       </div>
     );
   };
@@ -486,7 +631,13 @@ class App extends Component {
     return (
       <div>
         <div className="step__five">
-          <h2>Unpaid Parental Leave Taken</h2>
+          <h2>Unpaid Parental Leave Taken
+          <a href="#note" 
+            data-tooltip
+            data-tooltip-message="An employee does not accumulate annual leave or sick/carer's while being paid by the Paid Parental Leave Scheme, if the person is taking unpaid parental leave from their employer at this time. The Australian Government's Paid Parental Leave Scheme is not considered to be paid leave.">
+            <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+          </a>
+          </h2>
           <div className="row">
             <div className="col-sm-6">
               <label htmlFor="weeks1">Weeks</label>
@@ -497,6 +648,7 @@ class App extends Component {
                 type="number"
                 min="0"
                 placeholder="0"
+                defaultValue={this.state.empParentalLeave.weeks}
                 onChange={this.getHours}
               />
             </div>
@@ -509,13 +661,20 @@ class App extends Component {
                 type="number"
                 min="0"
                 placeholder="0"
+                defaultValue={this.state.empParentalLeave.hours}
                 onChange={this.getHours}
               />
             </div>
           </div>
         </div>
         <div className="step__five">
-          <h2>Other Unpaid Leave Taken</h2>
+          <h2>Other Unpaid Leave Taken
+          <a href="#note" 
+            data-tooltip
+            data-tooltip-message="Annual leave and sick/carer's don't accumulate when an employee is on unpaid authorised leave (except community service leave and some kinds of stand down, which still count as service).">
+            <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+          </a>
+          </h2>
           <div className="row">
             <div className="col-sm-6">
               <label htmlFor="weeks2">Weeks</label>
@@ -526,6 +685,7 @@ class App extends Component {
                 type="number"
                 min="0"
                 placeholder="0"
+                defaultValue={this.state.empOtherLeave.weeks}
                 onChange={this.getHours}
               />
             </div>
@@ -538,6 +698,7 @@ class App extends Component {
                 type="number"
                 min="0"
                 placeholder="0"
+                defaultValue={this.state.empOtherLeave.hours}
                 onChange={this.getHours}
               />
             </div>
@@ -555,6 +716,7 @@ class App extends Component {
                 type="number"
                 min="0"
                 placeholder="0"
+                defaultValue={this.state.empPaidLeave.weeks}
                 onChange={this.getHours}
               />
             </div>
@@ -567,6 +729,7 @@ class App extends Component {
                 type="number"
                 min="0"
                 placeholder="0"
+                defaultValue={this.state.empPaidLeave.hours}
                 onChange={this.getHours}
               />
             </div>
@@ -580,6 +743,7 @@ class App extends Component {
             Next
           </button>
         </div>
+        {this.progress()}
       </div>
     );
   };
@@ -622,6 +786,28 @@ class App extends Component {
             <p>{this.getResultWorkHours()[3]}</p>
           </li>
         </ul>
+        <div className="duo">
+          <button className="duo__back" onClick={this.stepBack}>
+            Back
+          </button>
+          <button className="duo__reset" onClick={this.reset}>
+            Calculate Again
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  displayCasualResult = () => {
+    return (
+      <div className="casual">
+      <h2>Casual Employees</h2>
+      <p>A casual employee don't get annual leave under the National Employment Standards, it does not have a firm commitment in advance from an employer about how long they will be employed for, or the days (or hours) they will work. A casual employee also does not commit to all work an employer might offer.</p>
+      <div className="duo">
+        <button className="duo__back" onClick={this.stepBack}>
+          Back
+        </button>
+      </div>
       </div>
     );
   };
@@ -639,8 +825,25 @@ class App extends Component {
       return this.displayStep5();
     } else if (this.state.userStep === 6) {
       return this.displayResult();
+    } else if (this.state.userStep === 7) {
+      // Display Casual Result
+      return this.displayCasualResult();
     }
   };
+
+
+  progress = () => {
+    return (
+      <div className="progress__bullet">
+        <span className={this.state.userStep >= 1 ? "filled" : ""}></span>
+        <span className={this.state.userStep >= 2 ? "filled" : ""}></span>
+        <span className={this.state.userStep >= 3 ? "filled" : ""}></span>
+        <span className={this.state.userStep >= 4 ? "filled" : ""}></span>
+        <span className={this.state.userStep >= 5 ? "filled" : ""}></span>
+        <span className={this.state.userStep >= 5 ? "filled" : ""}></span>
+      </div>
+    )
+  }
 
   render() {
     return <div className="leave__cal container">{this.displaySteps()}</div>;
