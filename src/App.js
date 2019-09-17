@@ -13,7 +13,7 @@ class App extends Component {
       empShiftworker: "",
       empStartDate: "",
       empEndDate: moment().format('YYYY-MM-DD'),
-      empTotalWeeklyHours: "",
+      empTotalWeeklyHours: 0,
       empWeeklyHours: {
         sunday: 0,
         monday: 0,
@@ -107,7 +107,6 @@ class App extends Component {
 
     let totalHours = formattedHours;
     let totalMinutes = formattedDate._data.minutes;
-    console.log((sumTotalHours - otherLeave - parentalLeave) / accrualRate - paidLeave)
     return (
       totalHours +
       (totalHours === 1 ? " hour" : " hours") +
@@ -154,10 +153,12 @@ class App extends Component {
   updateInput = e => {
     if (this.state.userStep > 3) {
       this.setState({ [e.target.name]: e.target.value });
+      var newStartDate = e.target.name === 'empStartDate' ? e.target.value : this.state.empStartDate;
+      var newEndDate = e.target.name === 'empEndDate' ? e.target.value : this.state.empEndDate;
       this.validation(
         this.state.empTotalWeeklyHours,
-        this.state.empStartDate,
-        this.state.empEndDate
+        newStartDate,
+        newEndDate
       );
     } else {
       if (e.target.value === "casual"){
@@ -215,8 +216,8 @@ class App extends Component {
         empStatus: "",
         empShiftworker: "",
         empStartDate: "",
-        empEndDate: "",
-        empTotalWeeklyHours: "",
+        empEndDate: moment().format('YYYY-MM-DD'),
+        empTotalWeeklyHours: 0,
         empWeeklyHours: {
           sunday: 0,
           monday: 0,
@@ -245,9 +246,9 @@ class App extends Component {
   stepBack = e => {
     if (this.state.userStep === 4) {
       this.setState({
-        empTotalWeeklyHours: "",
+        empTotalWeeklyHours: 0,
         empStartDate: "",
-        empEndDate: "",
+        empEndDate: moment().format('YYYY-MM-DD'),
         empWeeklyHours: {
           sunday: 0,
           monday: 0,
@@ -353,7 +354,7 @@ class App extends Component {
         <h2>Select Employment Type:
         <a href="#note" 
             data-tooltip
-            data-tooltip-message="It is important to know the type of employment because pay rates, leave and other entitlements can be different.">
+            data-tooltip-message="The type of employment determines your pay rate, leave, and other entitlements.">
             <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
           </a>
         </h2>
@@ -411,9 +412,7 @@ class App extends Component {
         <h2>Are you a shift worker? 
           <a href="#note" 
             data-tooltip
-            data-tooltip-message="A shiftworker for the purposes of the NES for an award or agreement free employee is someone who 
-            works for a business that requires shifts to be rostered 24 hours a day for 7 days a week; is also regularly rostered to work those shifts and
-            regularly works on Sundays and public holidays.">
+            data-tooltip-message="Under the NES, a shift worker is someone who works for a business that requires to be rostered 24/7 (regularly for those shifts), and works on Sundays and Public Holidays.">
             <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
           </a>
         </h2>
@@ -459,6 +458,11 @@ class App extends Component {
         <div className="step__row">
           <div className="step__col">
             <label htmlFor="startdate">Start date of work period</label>
+            <a href="#note" 
+              data-tooltip
+              data-tooltip-message="The start date of work that you want leave entitlement calculations to be applied. This will assume that your employment type will apply for the entire period.">
+                <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+              </a>
             <input
               id="startdate"
               name="empStartDate"
@@ -471,7 +475,7 @@ class App extends Component {
             <label htmlFor="enddate">End date of work period</label>
             <a href="#note" 
               data-tooltip
-              data-tooltip-message="The default date is today’s date. Unless you change the date in this field, your results will show leave accumulated until today.​">
+              data-tooltip-message="The end date of work that you want leave entitlement calculations to be applied. This will assume that your employment type will apply for the entire period.">
                 <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
               </a>
             <input
@@ -634,7 +638,7 @@ class App extends Component {
           <h2>Unpaid Parental Leave Taken
           <a href="#note" 
             data-tooltip
-            data-tooltip-message="An employee does not accumulate annual leave or sick/carer's while being paid by the Paid Parental Leave Scheme, if the person is taking unpaid parental leave from their employer at this time. The Australian Government's Paid Parental Leave Scheme is not considered to be paid leave.">
+            data-tooltip-message="Note that the Australian Government’s Paid Parental Leave Scheme is not considered to be paid leave.">
             <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
           </a>
           </h2>
@@ -671,7 +675,7 @@ class App extends Component {
           <h2>Other Unpaid Leave Taken
           <a href="#note" 
             data-tooltip
-            data-tooltip-message="Annual leave and sick/carer's don't accumulate when an employee is on unpaid authorised leave (except community service leave and some kinds of stand down, which still count as service).">
+            data-tooltip-message="Annual leave and sick/carer’s leave do not accumulate when an employee is on unpaid leave.">
             <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
           </a>
           </h2>
@@ -753,7 +757,7 @@ class App extends Component {
       <div className="result">
         <ul>
           <li>
-            <h2>Annual leave balance:</h2>
+            <h2>Leave balance:</h2>
             <h2>{this.getResultWorkHours()[5]}</h2>
           </li>
         </ul>
@@ -793,6 +797,10 @@ class App extends Component {
           <button className="duo__reset" onClick={this.reset}>
             Calculate Again
           </button>
+          <small>Disclaimer: All calculations and results are based on the Fair Work’s National Employment Standards (NES) and 
+            not based on a specific award. To calculate leave entitlements based on a specific award and/or 
+            find out more about leave entitlements, visit FWO’s 
+            <a href="https://calculate.fairwork.gov.au/Leave" target="_blank" rel="noopener noreferrer"> website</a>.</small>
         </div>
       </div>
     );
@@ -802,7 +810,7 @@ class App extends Component {
     return (
       <div className="casual">
       <h2>Casual Employees</h2>
-      <p>A casual employee don't get annual leave under the National Employment Standards, it does not have a firm commitment in advance from an employer about how long they will be employed for, or the days (or hours) they will work. A casual employee also does not commit to all work an employer might offer.</p>
+      <p>According to the NES, casual employees are not entitled for annual leave.</p>
       <div className="duo">
         <button className="duo__back" onClick={this.stepBack}>
           Back

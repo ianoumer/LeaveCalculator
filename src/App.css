@@ -3,7 +3,7 @@
 
 [data-tooltip] {
   position: relative;
-  color: #3C4754;
+  color: #3C4754 !important;
   margin: 0 5px;
 }
 
@@ -26,20 +26,19 @@
 [data-tooltip]:after {
   border-radius: 7px;
   content: attr(data-tooltip-message);
-  left: -5px;
+  left: -205px;
   margin-top: 30px;
-  padding: 8px 10px;
+  padding: 8px 15px;
   color: #FFFFFF;
   font-family: Lato;
   font-size: 14px;
-  font-size: 12px;
-  line-height: 16px;
+  line-height: 18px;
   text-align: left;
   white-space: pre-wrap;
-  width: 280px;
+  width: 265px;
   box-shadow: 0 2px 8px 0 rgba(0,0,0,0.12);
-  background-color: #3C4754;
-  z-index: 999;
+  background-color: #3c4754e8;
+  z-index: 4;
 }
 
 [data-tooltip]:hover:after,
@@ -55,7 +54,7 @@
   max-width: 763px;
   min-width: 329px;
   min-height: 340px;
-  margin: auto;
+  margin: auto auto 150px;
   padding: 40px;
   transition: 0.5s;
 }
@@ -110,6 +109,10 @@
 .leave__cal .duo > button {
   margin: 0 8px;
 }
+.leave__cal .duo > small {
+  display: block;
+  margin-top: 20px;
+}
 
 .leave__cal .duo > button.duo__back {
   border-color: #8a9bae;
@@ -151,6 +154,8 @@
   line-height: 27px;
   margin: 40px 0;
   text-align: center;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .leave__cal .label__parent {
@@ -201,10 +206,10 @@
 /* STEP FOUR */
 .leave__cal .step__four h2 {
   text-align: left;
-  margin: 30px 0 0;
+  margin: 20px 0 0;
 }
 .leave__cal .step__four p {
-  margin: 0 0 30px;
+  margin: 0 0 15px;
   color: #708093;
   text-align: left;
   max-width: 500px;
@@ -222,7 +227,8 @@
   transition: .5s;
 }
 
-.leave__cal .step__four {
+.leave__cal .step__four,
+.leave__cal .step__five {
   max-width: 600px;
   margin: auto;
 }
@@ -247,7 +253,7 @@
 }
 
 .leave__cal .step__four .part__two{
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 
 .leave__cal .step__four .part__two .step__row {
@@ -359,13 +365,14 @@
 }
 
 .leave__cal .result h3 {
-  color: #3FAFD7;	
-  font-family: Lato;	
-  font-size: 18px;	
-  font-weight: 600;	
-  line-height: 24px;	
+  color: #3FAFD7;
+  font-family: Lato;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
   text-align: center;
-  margin: 0;
+  text-transform: none;
+  letter-spacing: 0px;
   margin: 20px 0 30px;
 }
 
@@ -392,7 +399,7 @@
 
 .leave__cal .result ul li p:last-child {
   font-weight: bolder;
-  text-align: center;
+  text-align: right;
 }
 
 @media screen and (max-width: 767px) {
