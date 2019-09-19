@@ -55,9 +55,31 @@ class App extends Component {
     for (let i = 0; i < isoWeekday.length; i++) {
       let daysToAdd = (7 + isoWeekday[i] - startDate.isoWeekday()) % 7;
       let nextWeek = startDate.clone().add(daysToAdd, "days");
-      if (nextWeek.isAfter(endDate)) {
-        return 0;
-      }
+      // Computes when user inputs a date range less than a week
+      // if (nextWeek.isAfter(endDate)) {
+      //   if(endDate.diff(startDate,'days') < 6) {
+      //     return [
+      //       0,
+      //       this.getResultlLeaves(
+      //         0,
+      //         this.state.empParentalLeave.weeks,
+      //         this.state.empParentalLeave.hours
+      //       ),
+      //       this.getResultlLeaves(
+      //         0,
+      //         this.state.empOtherLeave.weeks,
+      //         this.state.empOtherLeave.hours
+      //       ),
+      //       this.getResultlLeaves(
+      //         0,
+      //         this.state.empPaidLeave.weeks,
+      //         this.state.empPaidLeave.hours
+      //       ),
+      //       this.getResultAccrualRate(this.state.empShiftworker),
+      //       this.getResultAnnualLeave(0, 0)
+      //     ];
+      //   }
+      // }
       let weeksBetween = endDate.diff(nextWeek, "weeks") + 1;
       totalHours.push(weeksBetween * days[isoWeekday[i]]);
       totalHoursPerWeek.push(days[isoWeekday[i]]);
@@ -132,6 +154,7 @@ class App extends Component {
     if (
       totalHours <= 38 &&
       totalHours !== 0 &&
+      endDate !== startDate &&
       moment(endDate).isAfter(startDate)
     ) {
       this.setState({ buttonNext: false });
@@ -141,7 +164,7 @@ class App extends Component {
   };
 
   errorNotes = () => {
-    if (moment(this.state.empStartDate).isAfter(moment(this.state.empEndDate))) {
+    if (moment(this.state.empStartDate).isAfter(moment(this.state.empEndDate)) || this.state.empStartDate === this.state.empEndDate) {
       return "The end date specified must be after the start date.";
     } else if (this.state.empTotalWeeklyHours > 38) {
       return "The number of hours specified must be less than or equal to 38";
@@ -249,6 +272,7 @@ class App extends Component {
         empTotalWeeklyHours: 0,
         empStartDate: "",
         empEndDate: moment().format('YYYY-MM-DD'),
+        buttonNext: true,
         empWeeklyHours: {
           sunday: 0,
           monday: 0,
@@ -284,7 +308,7 @@ class App extends Component {
         });
       } else {
         this.setState({
-          [e.target.name]: "",
+          [e.target.value] : "",
           userStep: this.state.userStep - 1
         });
       }
@@ -300,6 +324,9 @@ class App extends Component {
     ) {
       this.setState({ userStep: this.state.userStep + 1 });
     } else if (this.state.userStep === 5) {
+      setTimeout(function() {
+        document.getElementById("TandaModal").click();
+      }, 2000);
       this.setState({
         userStep: this.state.userStep + 1,
         empTotalParentalLeave:
