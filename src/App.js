@@ -324,9 +324,10 @@ class App extends Component {
     ) {
       this.setState({ userStep: this.state.userStep + 1 });
     } else if (this.state.userStep === 5) {
-      setTimeout(function() {
-        document.getElementById("TandaModal").click();
-      }, 2000);
+      // Triggers when app is connected
+      // setTimeout(function() {
+      //   document.getElementById("TandaModal").click();
+      // }, 2000);
       this.setState({
         userStep: this.state.userStep + 1,
         empTotalParentalLeave:
