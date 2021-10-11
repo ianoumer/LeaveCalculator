@@ -1,6 +1,6 @@
 This project was built by Noumer Banal. This is for portfolio purposes only.
 
-App is published on [Tanda.co](https://www.tanda.co/tools/leave-calculator/).
+App is published on [Tanda.co/tools/leave-calculator/](https://www.tanda.co/tools/leave-calculator/).
 
 ## Project 
 
