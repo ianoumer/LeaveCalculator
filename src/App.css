@@ -47,9 +47,8 @@
 }
 
 #root {
-  background-color: #26496E;
+  background-color: #3FAFD7;
   height: 100vh;
-  padding: 10px;
   display: flex;
   align-items: center;
 }
@@ -57,9 +56,9 @@
 
 .leave__cal {
   border-radius: 24px;
-  background-color: #ffffff;
+  background-color: #ffffff;;
   max-width: 763px;
-  min-width: 329px;
+  min-width: 320px;
   min-height: 340px;
   padding: 40px;
   transition: 0.5s;
@@ -76,7 +75,7 @@
 }
 
 .leave__cal .progress__bullet > span.filled{
-  background-color: #26496E;
+  background-color: #3FAFD7;
 }
 
 .leave__cal .progress__bullet > span{
